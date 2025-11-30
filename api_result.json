@@ -1,0 +1,244 @@
+{
+  "center": [
+    31.2135,
+    121.44375
+  ],
+  "candidates": [
+    {
+      "name": "星巴克(武康路店)",
+      "addr": "上海市徐汇区武康路420号1F",
+      "lat": 31.21089,
+      "lon": 121.444233,
+      "avg_travel_time_min": 2.3,
+      "raw": {
+        "name": "星巴克(武康路店)",
+        "location": {
+          "lat": 31.21089,
+          "lng": 121.444233
+        },
+        "address": "上海市徐汇区武康路420号1F",
+        "province": "上海市",
+        "city": "上海市",
+        "area": "长宁区",
+        "street_id": "65ac770a6f1e17d2077ce842",
+        "telephone": "021-54560060",
+        "detail": 1,
+        "uid": "65ac770a6f1e17d2077ce842",
+        "detail_info": {
+          "classified_poi_tag": "美食;咖啡厅",
+          "distance": 293,
+          "tag": "美食;咖啡厅",
+          "navi_location": {
+            "lat": 31.210859,
+            "lng": 121.444138
+          },
+          "brand": "星巴克",
+          "type": "cater",
+          "detail_url": "http://api.map.baidu.com/place/detail?uid=65ac770a6f1e17d2077ce842&output=html&source=placeapi_v3",
+          "price": "37.0",
+          "overall_rating": "4.2",
+          "comment_num": "10",
+          "shop_hours": "06:30-22:30",
+          "label": "咖啡厅",
+          "children": []
+        }
+      }
+    },
+    {
+      "name": "byebyeland",
+      "addr": "淮海中路1881号",
+      "lat": 31.209854,
+      "lon": 121.444027,
+      "avg_travel_time_min": 2.3,
+      "raw": {
+        "name": "byebyeland",
+        "location": {
+          "lat": 31.209854,
+          "lng": 121.444027
+        },
+        "address": "淮海中路1881号",
+        "province": "上海市",
+        "city": "上海市",
+        "area": "徐汇区",
+        "telephone": "17621426609",
+        "detail": 1,
+        "uid": "79fd562d50e46bb504fef501",
+        "detail_info": {
+          "classified_poi_tag": "美食;咖啡厅",
+          "distance": 406,
+          "tag": "美食;咖啡厅",
+          "navi_location": {
+            "lat": 31.210053,
+            "lng": 121.443963
+          },
+          "type": "cater",
+          "detail_url": "http://api.map.baidu.com/place/detail?uid=79fd562d50e46bb504fef501&output=html&source=placeapi_v3",
+          "price": "34.0",
+          "overall_rating": "3.8",
+          "shop_hours": "08:30-19:30",
+          "label": "咖啡厅",
+          "children": [],
+          "parent_id": "574171a54763a8c9c26c1496"
+        }
+      }
+    },
+    {
+      "name": "% Arabica阿拉比卡咖啡(武康路店)",
+      "addr": "武康路376号武康庭1楼112",
+      "lat": 31.21285,
+      "lon": 121.44545,
+      "avg_travel_time_min": 2.3,
+      "raw": {
+        "name": "% Arabica阿拉比卡咖啡(武康路店)",
+        "location": {
+          "lat": 31.21285,
+          "lng": 121.44545
+        },
+        "address": "武康路376号武康庭1楼112",
+        "province": "上海市",
+        "city": "上海市",
+        "area": "徐汇区",
+        "telephone": "13391031659",
+        "detail": 1,
+        "uid": "7d67eb7207d339ef6e20b934",
+        "detail_info": {
+          "classified_poi_tag": "美食;咖啡厅",
+          "new_alias": "% Arabica阿拉比卡咖啡(武康路店);%Arabica(Arabica上海武康路店)",
+          "distance": 177,
+          "tag": "美食;咖啡厅",
+          "navi_location": {
+            "lat": 31.21283,
+            "lng": 121.445347
+          },
+          "brand": "% Arabica阿拉比卡咖啡",
+          "type": "cater",
+          "detail_url": "http://api.map.baidu.com/place/detail?uid=7d67eb7207d339ef6e20b934&output=html&source=placeapi_v3",
+          "price": "44.0",
+          "overall_rating": "4.4",
+          "comment_num": "8",
+          "shop_hours": "08:00-18:00",
+          "label": "咖啡厅",
+          "children": [],
+          "parent_id": "39d43f823e4783fba8059d08"
+        }
+      }
+    },
+    {
+      "name": "石藤咖啡(幸福店)",
+      "addr": "平武路38号107",
+      "lat": 31.214854,
+      "lon": 121.436644,
+      "avg_travel_time_min": 2.5,
+      "raw": {
+        "name": "石藤咖啡(幸福店)",
+        "location": {
+          "lat": 31.214854,
+          "lng": 121.436644
+        },
+        "address": "平武路38号107",
+        "province": "上海市",
+        "city": "上海市",
+        "area": "长宁区",
+        "telephone": "13918468282",
+        "detail": 1,
+        "uid": "f4add69c7d22b7b7d0f49eb8",
+        "detail_info": {
+          "classified_poi_tag": "美食;咖啡厅",
+          "distance": 692,
+          "tag": "美食;咖啡厅",
+          "navi_location": {
+            "lat": 31.214729,
+            "lng": 121.436653
+          },
+          "brand": "石藤咖啡",
+          "type": "cater",
+          "detail_url": "http://api.map.baidu.com/place/detail?uid=f4add69c7d22b7b7d0f49eb8&output=html&source=placeapi_v3",
+          "price": "28.0",
+          "overall_rating": "4.1",
+          "shop_hours": "09:30-18:00",
+          "label": "咖啡厅",
+          "children": [],
+          "parent_id": "5d4b6a4ee49f80339122e08c"
+        }
+      }
+    },
+    {
+      "name": "RAC BAR(安福路店)",
+      "addr": "安福路322号6幢一楼（武康路与安福路交叉口旁）",
+      "lat": 31.219613,
+      "lon": 121.446506,
+      "avg_travel_time_min": 2.6,
+      "raw": {
+        "name": "RAC BAR(安福路店)",
+        "location": {
+          "lat": 31.219613,
+          "lng": 121.446506
+        },
+        "address": "安福路322号6幢一楼（武康路与安福路交叉口旁）",
+        "province": "上海市",
+        "city": "上海市",
+        "area": "徐汇区",
+        "street_id": "33cb147b247690108f1a89db",
+        "telephone": "13636595172",
+        "detail": 1,
+        "uid": "33cb147b247690108f1a89db",
+        "detail_info": {
+          "classified_poi_tag": "美食;外国餐厅;西餐厅;法国菜",
+          "new_alias": "RAC;RACBAR;rac",
+          "distance": 728,
+          "tag": "美食;外国餐厅",
+          "navi_location": {
+            "lat": 31.219516,
+            "lng": 121.446532
+          },
+          "type": "cater",
+          "detail_url": "http://api.map.baidu.com/place/detail?uid=33cb147b247690108f1a89db&output=html&source=placeapi_v3",
+          "price": "142.0",
+          "overall_rating": "4.3",
+          "comment_num": "200",
+          "shop_hours": "08:00-17:00",
+          "label": "法国菜",
+          "children": []
+        }
+      }
+    },
+    {
+      "name": "Vinaio by Salute",
+      "addr": "上海市复兴西路147号",
+      "lat": 31.216915,
+      "lon": 121.448767,
+      "avg_travel_time_min": 2.6,
+      "raw": {
+        "name": "Vinaio by Salute",
+        "location": {
+          "lat": 31.216915,
+          "lng": 121.448767
+        },
+        "address": "上海市复兴西路147号",
+        "province": "上海市",
+        "city": "上海市",
+        "area": "徐汇区",
+        "telephone": "18616295030",
+        "detail": 1,
+        "uid": "fd2ba4cb112dd65de3110324",
+        "detail_info": {
+          "classified_poi_tag": "美食;咖啡厅",
+          "distance": 609,
+          "tag": "美食;咖啡厅",
+          "navi_location": {
+            "lat": 31.217063,
+            "lng": 121.448772
+          },
+          "type": "cater",
+          "detail_url": "http://api.map.baidu.com/place/detail?uid=fd2ba4cb112dd65de3110324&output=html&source=placeapi_v3",
+          "price": "44.0",
+          "overall_rating": "4.0",
+          "shop_hours": "10:00-24:00",
+          "label": "咖啡厅",
+          "children": []
+        }
+      }
+    }
+  ],
+  "note": "路网矩阵响应格式不符，已退回直线估算"
+}

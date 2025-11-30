@@ -1,0 +1,14 @@
+fastapi
+uvicorn
+httpx
+python-dotenv
+pydantic
+python-multipart
+pandas
+icalendar
+pymysql
+sqlalchemy
+holidays
+requests
+openpyxl
+pillow

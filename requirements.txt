@@ -12,3 +12,4 @@ holidays
 requests
 openpyxl
 pillow
+PyJWT

@@ -179,22 +179,24 @@ async def recommend_places(req: PlaceRequest, db: Session = Depends(get_db)):
             ]
             # 确保返回正确编码的JSON响应
             response_data = {
-                "center": mock_center,
-                "candidates": mock_candidates,
-                "note": f"百度API调用失败: {error_msg}。返回模拟数据用于演示。",
-                "api_error_code": ps_json.get('status')
+                "success": True,
+                "data": {
+                    "center": mock_center,
+                    "candidates": mock_candidates,
+                    "note": f"百度API调用失败: {error_msg}。返回模拟数据用于演示。",
+                    "api_error_code": ps_json.get('status')
+                }
             }
-            return JSONResponse(content=response_data, media_type="application/json; charset=utf-8")
+            return response_data
         # 返回明确编码的错误响应
-        return JSONResponse(
+        raise HTTPException(
             status_code=502,
-            content={"detail": f"百度POI错误: {error_msg}", "error_code": ps_json.get('status')},
-            media_type="application/json; charset=utf-8"
+            detail={"success": False, "message": f"百度POI错误: {error_msg}", "error_code": ps_json.get('status')}
         )
 
     raw_results = ps_json.get("results", [])[:12]
     if not raw_results:
-        return {"center": center, "candidates": []}
+        return {"success": True, "data": {"center": center, "candidates": []}}
 
     # 构造 origins / destinations
     origins = "|".join([f"{lat},{lon}" for lat, lon in cleaned_coords])
@@ -832,11 +834,11 @@ async def recommend_places(req: PlaceRequest, db: Session = Depends(get_db)):
     candidates = candidates[:6]
     
     # 构造返回结果
-    result = {"center": center, "candidates": [c.dict() for c in candidates[:6]]}
+    result_data = {"center": center, "candidates": [c.dict() for c in candidates[:6]]}
     if note:
-        result["note"] = note
+        result_data["note"] = note
     if error_type:
-        result["api_error_type"] = error_type
+        result_data["api_error_type"] = error_type
     
-    return result
+    return {"success": True, "data": result_data}
 

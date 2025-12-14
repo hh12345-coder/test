@@ -112,9 +112,12 @@ def create_team(req: TeamCreate, current_user: User = Depends(get_current_user),
     db.refresh(team)
     
     return {
-        **team.__dict__,
-        "member_count": 1,
-        "is_owner": True
+        "success": True,
+        "data": {
+            **team.__dict__,
+            "member_count": 1,
+            "is_owner": True
+        }
     }
 
 @router.get("", response_model=List[TeamResponse])
@@ -131,14 +134,17 @@ def list_teams(current_user: User = Depends(get_current_user), db: Session = Dep
     
     all_teams = owned_teams + member_teams
     
-    return [
-        {
-            **team.__dict__,
-            "member_count": len(team.members),
-            "is_owner": team.owner_id == current_user.id
-        }
-        for team in all_teams
-    ]
+    return {
+        "success": True,
+        "data": [
+            {
+                **team.__dict__,
+                "member_count": len(team.members),
+                "is_owner": team.owner_id == current_user.id
+            }
+            for team in all_teams
+        ]
+    }
 
 @router.get("/{team_id}", response_model=TeamResponse)
 def get_team(team_id: int, current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
@@ -157,9 +163,12 @@ def get_team(team_id: int, current_user: User = Depends(get_current_user), db: S
         raise HTTPException(status_code=403, detail="无权限访问此团队")
     
     return {
-        **team.__dict__,
-        "member_count": len(team.members),
-        "is_owner": team.owner_id == current_user.id
+        "success": True,
+        "data": {
+            **team.__dict__,
+            "member_count": len(team.members),
+            "is_owner": team.owner_id == current_user.id
+        }
     }
 
 @router.put("/{team_id}", response_model=TeamResponse)
@@ -182,9 +191,12 @@ def update_team(team_id: int, req: TeamUpdate, current_user: User = Depends(get_
     db.refresh(team)
     
     return {
-        **team.__dict__,
-        "member_count": len(team.members),
-        "is_owner": True
+        "success": True,
+        "data": {
+            **team.__dict__,
+            "member_count": len(team.members),
+            "is_owner": True
+        }
     }
 
 @router.delete("/{team_id}")
@@ -200,7 +212,10 @@ def delete_team(team_id: int, current_user: User = Depends(get_current_user), db
     db.delete(team)
     db.commit()
     
-    return {"message": "团队已删除"}
+    return {
+        "success": True,
+        "data": {"message": "团队已删除"}
+    }
 
 @router.get("/{team_id}/members", response_model=List[TeamMemberResponse])
 def get_team_members(team_id: int, current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
@@ -220,21 +235,24 @@ def get_team_members(team_id: int, current_user: User = Depends(get_current_user
     
     members = db.query(TeamMember).filter(TeamMember.team_id == team_id).all()
     
-    return [
-        {
-            "id": m.id,
-            "user_id": m.user_id,
-            "role": m.role.value,
-            "joined_at": m.joined_at,
-            "user": {
-                "id": m.user.id,
-                "openid": m.user.openid,
-                "nickname": m.user.nickname or "未命名",
-                "school": m.user.school
+    return {
+        "success": True,
+        "data": [
+            {
+                "id": m.id,
+                "user_id": m.user_id,
+                "role": m.role.value,
+                "joined_at": m.joined_at,
+                "user": {
+                    "id": m.user.id,
+                    "openid": m.user.openid,
+                    "nickname": m.user.nickname or "未命名",
+                    "school": m.user.school
+                }
             }
-        }
-        for m in members
-    ]
+            for m in members
+        ]
+    }
 
 @router.delete("/{team_id}/members/{member_id}")
 def remove_member(team_id: int, member_id: int, current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
@@ -262,7 +280,10 @@ def remove_member(team_id: int, member_id: int, current_user: User = Depends(get
     db.delete(member)
     db.commit()
     
-    return {"message": "成员已移除"}
+    return {
+        "success": True,
+        "data": {"message": "成员已移除"}
+    }
 
 # ==================== 邀请管理 API ====================
 
@@ -336,21 +357,24 @@ def send_invitation(req: InvitationCreate, current_user: User = Depends(get_curr
     db.refresh(invitation)
     
     return {
-        "id": invitation.id,
-        "team_id": invitation.team_id,
-        "team": {
-            "id": team.id,
-            "name": team.name,
-            "description": team.description,
-            "member_count": len(team.members)
-        },
-        "inviter": {
-            "id": current_user.id,
-            "openid": current_user.openid,
-            "nickname": current_user.nickname or "用户"
-        },
-        "status": invitation.status.value,
-        "created_at": invitation.created_at
+        "success": True,
+        "data": {
+            "id": invitation.id,
+            "team_id": invitation.team_id,
+            "team": {
+                "id": team.id,
+                "name": team.name,
+                "description": team.description,
+                "member_count": len(team.members)
+            },
+            "inviter": {
+                "id": current_user.id,
+                "openid": current_user.openid,
+                "nickname": current_user.nickname or "用户"
+            },
+            "status": invitation.status.value,
+            "created_at": invitation.created_at
+        }
     }
 
 @router.get("/invitations", response_model=List[InvitationResponse])
@@ -361,26 +385,29 @@ def get_invitations(current_user: User = Depends(get_current_user), db: Session 
         Invitation.status == InvitationStatus.PENDING
     ).all()
     
-    return [
-        {
-            "id": inv.id,
-            "team_id": inv.team_id,
-            "team": {
-                "id": inv.team.id,
-                "name": inv.team.name,
-                "description": inv.team.description,
-                "member_count": len(inv.team.members)
-            },
-            "inviter": {
-                "id": inv.inviter.id,
-                "openid": inv.inviter.openid,
-                "nickname": inv.inviter.nickname or "用户"
-            },
-            "status": inv.status.value,
-            "created_at": inv.created_at
-        }
-        for inv in invitations
-    ]
+    return {
+        "success": True,
+        "data": [
+            {
+                "id": inv.id,
+                "team_id": inv.team_id,
+                "team": {
+                    "id": inv.team.id,
+                    "name": inv.team.name,
+                    "description": inv.team.description,
+                    "member_count": len(inv.team.members)
+                },
+                "inviter": {
+                    "id": inv.inviter.id,
+                    "openid": inv.inviter.openid,
+                    "nickname": inv.inviter.nickname or "用户"
+                },
+                "status": inv.status.value,
+                "created_at": inv.created_at
+            }
+            for inv in invitations
+        ]
+    }
 
 @router.post("/invitations/{invitation_id}/accept")
 def accept_invitation(invitation_id: int, current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
@@ -417,7 +444,10 @@ def accept_invitation(invitation_id: int, current_user: User = Depends(get_curre
     
     db.commit()
     
-    return {"message": "已加入团队"}
+    return {
+        "success": True,
+        "data": {"message": "已加入团队"}
+    }
 
 @router.post("/invitations/{invitation_id}/reject")
 def reject_invitation(invitation_id: int, current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
@@ -439,7 +469,10 @@ def reject_invitation(invitation_id: int, current_user: User = Depends(get_curre
     
     db.commit()
     
-    return {"message": "已拒绝邀请"}
+    return {
+        "success": True,
+        "data": {"message": "已拒绝邀请"}
+    }
 
 # ==================== 邀请链接 API ====================
 
@@ -486,9 +519,12 @@ def generate_invite_link(req: dict, current_user: User = Depends(get_current_use
     invite_link = f"{base_url}/pages/team/invitations?teamId={team_id}&inviteCode={invite_code}"
     
     return {
-        "link": invite_link,
-        "inviteCode": invite_code,
-        "teamId": team_id
+        "success": True,
+        "data": {
+            "link": invite_link,
+            "inviteCode": invite_code,
+            "teamId": team_id
+        }
     }
 
 @router.post("/accept_invite")
@@ -540,4 +576,7 @@ def accept_invite(req: dict, current_user: User = Depends(get_current_user), db:
     
     db.commit()
     
-    return {"message": "成功加入团队"}
+    return {
+        "success": True,
+        "data": {"message": "成功加入团队"}
+    }

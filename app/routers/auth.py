@@ -75,11 +75,14 @@ async def login(req: LoginRequest, db: Session = Depends(get_db)):
         token = create_access_token(data={"sub": str(user.id), "openid": user.openid})
         
         return {
-            "token": token,
-            "user": {
-                "id": user.id,
-                "nickname": user.nickname
+            "success": True,
+            "data": {
+                "token": token,
+                "user": {
+                    "id": user.id,
+                    "nickname": user.nickname
+                }
             }
         }
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"登录失败: {str(e)}")
+        raise HTTPException(status_code=400, detail={"success": False, "message": str(e)})

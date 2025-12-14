@@ -30,7 +30,7 @@ DEFAULT_SCHOOLS = [
     {"name": "上海大学（宝山）", "lat": 31.318855, "lon": 121.487706, "city": "上海", "province": "上海"},
 ]
 
-@router.get("", response_model=List[SchoolResponse])
+@router.get("")
 def list_schools(db: Session = Depends(get_db)):
     """获取所有学校列表"""
     schools = db.query(School).all()
@@ -43,17 +43,19 @@ def list_schools(db: Session = Depends(get_db)):
         db.commit()
         schools = db.query(School).all()
     
-    return schools
+    # 转换为响应模型列表
+    school_responses = [SchoolResponse.from_orm(school) for school in schools]
+    return {"success": True, "data": school_responses}
 
-@router.get("/{school_id}", response_model=SchoolResponse)
+@router.get("/{school_id}")
 def get_school(school_id: int, db: Session = Depends(get_db)):
     """获取学校详情"""
     school = db.query(School).filter(School.id == school_id).first()
     if not school:
         raise HTTPException(status_code=404, detail="学校不存在")
-    return school
+    return {"success": True, "data": SchoolResponse.from_orm(school)}
 
-@router.post("", response_model=SchoolResponse)
+@router.post("")
 def create_school(name: str, lat: float, lon: float, city: Optional[str] = None, province: Optional[str] = None, db: Session = Depends(get_db)):
     """创建新学校（管理员功能）"""
     # 检查是否已存在
@@ -65,5 +67,5 @@ def create_school(name: str, lat: float, lon: float, city: Optional[str] = None,
     db.add(school)
     db.commit()
     db.refresh(school)
-    return school
+    return {"success": True, "data": SchoolResponse.from_orm(school)}
 

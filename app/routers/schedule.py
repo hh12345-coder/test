@@ -52,12 +52,12 @@ async def upload_schedule(
     支持: .ics, .xlsx, .csv
     """
     print("🚀 ENTER /schedule/upload")
-    print(f"📄 FILE: {file.filename}, SIZE: {len(content)} bytes")
     
     if not file.filename.endswith(('.ics','.xlsx','.csv')):
         raise HTTPException(status_code=400, detail="文件格式不支持")
     
     content = await file.read()
+    print(f"📄 FILE: {file.filename}, SIZE: {len(content)} bytes")
     
     try:
         # 打印解析器信息
@@ -97,6 +97,7 @@ async def upload_schedule(
         
         # 返回保存后的课程信息
         return {
+            "success": True,
             "data": [
                 {
                     "day": course.day,
@@ -110,7 +111,7 @@ async def upload_schedule(
         }
     except Exception as e:
         db.rollback()
-        raise HTTPException(status_code=500, detail=f"课表解析失败: {e}")
+        raise HTTPException(status_code=400, detail=str(e))
     
 @router.post("/upload/screenshot")
 async def upload_screenshot(file: UploadFile = File(...)):
@@ -186,7 +187,7 @@ async def upload_screenshot(file: UploadFile = File(...)):
 
     # 如果没有拿到模型文本，返回原始 JSON 以便排查
     if not model_text:
-        return {"source": "deepseek", "parsed": None, "model_text": None, "raw_response": j}
+        return {"success": True, "source": "deepseek", "parsed": None, "model_text": None, "raw_response": j}
 
     # 尝试解析出 JSON
     parsed = None
@@ -204,9 +205,9 @@ async def upload_screenshot(file: UploadFile = File(...)):
 
     # 如果解析成功并且包含 courses 字段就返回，否则把模型文本和原始响应都返回
     if parsed and isinstance(parsed, dict) and "courses" in parsed:
-        return {"source": "deepseek", "parsed": parsed, "raw_response": j}
+        return {"success": True, "source": "deepseek", "parsed": parsed, "raw_response": j}
     else:
-        return {"source": "deepseek", "parsed": parsed, "model_text": model_text, "raw_response": j}
+        return {"success": True, "source": "deepseek", "parsed": parsed, "model_text": model_text, "raw_response": j}
 
 @router.post("/upload/screenshots")
 async def upload_screenshots(files: List[UploadFile] = File(...)):
@@ -361,7 +362,7 @@ async def upload_screenshots(files: List[UploadFile] = File(...)):
                 "error": str(e)
             })
     
-    return {"results": results}
+    return {"success": True, "results": results}
 
 @router.post("/save")
 async def save_schedule(
@@ -372,24 +373,28 @@ async def save_schedule(
     """
     保存用户的课表到数据库
     """
-    # 先删除用户旧的课表
-    db.query(Schedule).filter(Schedule.user_id == current_user.id).delete()
-    
-    # 保存新课表
-    for item in schedule_data:
-        # 将weeks列表转换为逗号分隔的字符串
-        weeks_str = ",".join(map(str, item.weeks)) if item.weeks else ""
-        schedule = Schedule(
-            user_id=current_user.id,
-            day=item.day,
-            start=item.start,
-            end=item.end,
-            weeks=weeks_str
-        )
-        db.add(schedule)
-    
-    db.commit()
-    return {"message": "课表保存成功", "count": len(schedule_data)}
+    try:
+        # 先删除用户旧的课表
+        db.query(Schedule).filter(Schedule.user_id == current_user.id).delete()
+        
+        # 保存新课表
+        for item in schedule_data:
+            # 将weeks列表转换为逗号分隔的字符串
+            weeks_str = ",".join(map(str, item.weeks)) if item.weeks else ""
+            schedule = Schedule(
+                user_id=current_user.id,
+                day=item.day,
+                start=item.start,
+                end=item.end,
+                weeks=weeks_str
+            )
+            db.add(schedule)
+        
+        db.commit()
+        return {"success": True, "message": "课表保存成功", "count": len(schedule_data)}
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=400, detail=str(e))
 
 @router.get("/my")
 async def get_my_schedule(
@@ -678,10 +683,11 @@ async def compute_free_times(req: FreeTimeRequest, db: Session = Depends(get_db)
         free_times.sort(key=score_time)
         
         return {
+            'success': True,
             'free_times': free_times,
             'recommended_time': free_times[0] if free_times else None,
             'current_week': current_week,
             'total_free_slots': sum(day_blocks.count(False) for day_blocks in time_blocks.values())
         }
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f'计算空闲时间失败: {str(e)}')
+        raise HTTPException(status_code=400, detail=str(e))

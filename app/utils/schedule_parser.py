@@ -72,142 +72,43 @@ def parse_schedule_file(filename: str, content: bytes):
     print("✅ VALIDATION PASSED")
     return result
 
+def parse_excel_simple(content: bytes):
+    """
+    简化版 Excel 课表解析器
+    直接取前四列并硬编码列名为 day, start, end, course
+    """
+    print("🔥 USING SIMPLIFIED parse_excel VERSION 🔥")
+    df = pd.read_excel(io.BytesIO(content), engine='openpyxl')
+    # 去掉空行
+    df = df.dropna(how='all')
+    # 取前四列
+    df = df.iloc[:, :4]
+    df.columns = ['day', 'start', 'end', 'course']  # 硬编码列名
+    schedule = []
+    for _, row in df.iterrows():
+        day = str(row['day']).strip()
+        start = str(row['start']).strip()
+        end = str(row['end']).strip()
+        course = str(row['course']).strip()
+        if day and start and end:
+            schedule.append({
+                'day': day,
+                'start': start,
+                'end': end,
+                'course': course,
+                'weeks': DEFAULT_WEEKS
+            })
+    if not schedule:
+        raise ValueError("解析失败：课表为空")
+    return schedule
+
+
 def parse_excel(content: bytes):
     """
     解析 Excel 课表
-    支持多种格式：
-    1. 列名为 Day/Start/End/Course
-    2. 列名为 日期/开始时间/结束时间/课程
-    3. 列名为 星期/开始时间/结束时间/课程名称
-    4. 自动检测课程表模式（行为天，列为节次）
-    5. 上财矩阵型课表（星期×节次结构）
+    使用简化版解析器，直接取前四列并硬编码列名
     """
-    print("🔥 USING NEW parse_excel VERSION 🔥")
-    try:
-        # 首先尝试解析上财矩阵型课表（使用header=None保持原始结构）
-        original_df = pd.read_excel(io.BytesIO(content), sheet_name=0, engine='openpyxl', header=None)
-        
-        # 保存原始列名用于调试
-        original_columns = original_df.columns.tolist()
-        print(f"原始列名: {original_columns}")
-        
-        try:
-            result = parse_sufe_matrix_excel(original_df)
-            print("成功解析为上财矩阵型课表")
-            return result
-        except Exception as e:
-            print(f"上财矩阵课表解析失败: {e}")
-    except Exception as e:
-        raise ValueError(f"读取 Excel 失败: {str(e)}")
-
-    # 如果不是上财矩阵型课表，再以常规方式读取文件（使用默认header=0）
-    try:
-        df = pd.read_excel(io.BytesIO(content), sheet_name=0, engine='openpyxl')
-    except Exception as e:
-        raise ValueError(f"读取 Excel 失败: {str(e)}")
-
-    # 标准化列名
-    df.columns = [col.lower().strip() for col in df.columns]
-    print(f"标准化后列名: {df.columns.tolist()}")
-
-    # 支持的列名映射（包含教学周）
-    # 注意：键是我们内部使用的字段名，值是可能的列名
-    possible_column_names = {
-        'day': ['day', '日期', '星期', '周几', '星期几'],
-        'start': ['start', '开始时间', '上课时间', '开始', '时间'],
-        'end': ['end', '结束时间', '下课时间', '结束'],
-        'course': ['course', '课程', '课程名称', '科目'],
-        'weeks': ['weeks', '教学周', '周次', '周数']
-    }
-
-    # 自动检测列名映射
-    detected_mapping = {}
-    for field, possible_names in possible_column_names.items():
-        for name in possible_names:
-            if name in df.columns:
-                detected_mapping[field] = name
-                break
-    print(f"检测到的列名映射: {detected_mapping}")
-
-    # 检查是否找到了所有必要的列
-    required_fields = ['day', 'start', 'end']
-    if all(field in detected_mapping for field in required_fields):
-        schedule = []
-        for _, row in df.iterrows():
-            day = str(row[detected_mapping['day']]).strip()
-            start = str(row[detected_mapping['start']]).strip()
-            end = str(row[detected_mapping['end']]).strip()
-            course = str(row.get(detected_mapping.get('course', ''), '')).strip()
-            weeks_str = str(row.get(detected_mapping.get('weeks', ''), '')).strip()
-
-            # 解析教学周
-            weeks = []
-            if weeks_str and weeks_str != 'nan':
-                if '-' in weeks_str:
-                    # 范围格式，如 '1-8'
-                    try:
-                        start_week, end_week = map(int, weeks_str.split('-'))
-                        weeks = list(range(start_week, end_week + 1))
-                    except ValueError:
-                        pass
-                elif ',' in weeks_str:
-                    # 逗号分隔格式，如 '1,3,5'
-                    weeks = [int(w) for w in weeks_str.split(',') if w.strip().isdigit()]
-                else:
-                    # 尝试直接转换为整数
-                    try:
-                        weeks = [int(weeks_str)]
-                    except ValueError:
-                        weeks = []
-                
-                # 额外处理常见的教学周格式，如 "第1-8周"
-                if not weeks and '周' in weeks_str:
-                    import re
-                    week_ranges = re.findall(r'(\d+)-(\d+)周', weeks_str)
-                    if week_ranges:
-                        for start_w, end_w in week_ranges:
-                            try:
-                                weeks.extend(range(int(start_w), int(end_w) + 1))
-                            except ValueError:
-                                pass
-                        # 去重并排序
-                        weeks = sorted(list(set(weeks)))
-                
-            # 基础校验
-            if day and start and end:
-                schedule_item = {
-                    'day': day,
-                    'start': start,
-                    'end': end,
-                    'course': course
-                }
-                # 如果没有明确周次，默认整个学期
-                if not weeks:
-                    weeks = DEFAULT_WEEKS
-                schedule_item['weeks'] = weeks
-                schedule.append(schedule_item)
-
-        if schedule:
-            return schedule
-
-    # 自动检测课程表模式（行为天，列为节次）
-    if '周一' in df.columns:
-        schedule = []
-        for day in ['周一', '周二', '周三', '周四', '周五', '周六', '周日']:
-            if day in df.columns:
-                for index, value in df[day].items():
-                    if pd.notna(value):
-                        schedule.append({
-                            'day': day,
-                            'start': f"{index + 1}:00",
-                            'end': f"{index + 2}:00",
-                            'course': str(value).strip(),
-                            'weeks': DEFAULT_WEEKS  # 默认整个学期
-                        })
-        if schedule:
-            return schedule
-
-    raise ValueError("Excel 格式无法识别。请确保列名正确或使用支持的格式。")
+    return parse_excel_simple(content)
 
 def parse_csv(content: bytes):
     """

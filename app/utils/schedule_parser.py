@@ -3,6 +3,8 @@ import re
 import pandas as pd
 from icalendar import Calendar
 
+DEFAULT_WEEKS = list(range(1, 17))  # 默认整个学期（1~16周）
+
 def parse_schedule_file(filename: str, content: bytes):
     """
     解析课表文件（支持 .ics、.xlsx 和 .csv 格式）
@@ -179,8 +181,10 @@ def parse_excel(content: bytes):
                     'end': end,
                     'course': course
                 }
-                if weeks:
-                    schedule_item['weeks'] = weeks
+                # 如果没有明确周次，默认整个学期
+                if not weeks:
+                    weeks = DEFAULT_WEEKS
+                schedule_item['weeks'] = weeks
                 schedule.append(schedule_item)
 
         if schedule:
@@ -197,7 +201,8 @@ def parse_excel(content: bytes):
                             'day': day,
                             'start': f"{index + 1}:00",
                             'end': f"{index + 2}:00",
-                            'course': str(value).strip()
+                            'course': str(value).strip(),
+                            'weeks': DEFAULT_WEEKS  # 默认整个学期
                         })
         if schedule:
             return schedule
@@ -290,8 +295,10 @@ def parse_csv(content: bytes):
                     'end': end,
                     'course': course
                 }
-                if weeks:
-                    schedule_item['weeks'] = weeks
+                # 如果没有明确周次，默认整个学期
+                if not weeks:
+                    weeks = DEFAULT_WEEKS
+                schedule_item['weeks'] = weeks
                 schedule.append(schedule_item)
         
         if schedule:
@@ -335,7 +342,8 @@ def parse_ics(content: bytes):
                         'day': weekday,
                         'start': start_time,
                         'end': end_time,
-                        'course': str(summary)
+                        'course': str(summary),
+                        'weeks': DEFAULT_WEEKS  # 默认整个学期
                     })
             except Exception as e:
                 # 跳过无法解析的事件
@@ -417,8 +425,10 @@ def parse_sufe_matrix_excel(df: pd.DataFrame):
                         'end': end,
                         'course': course_name
                     }
-                    if weeks:
-                        item['weeks'] = weeks
+                    # 如果没有明确周次，默认整个学期
+                    if not weeks:
+                        weeks = DEFAULT_WEEKS
+                    item['weeks'] = weeks
 
                     schedule.append(item)
 

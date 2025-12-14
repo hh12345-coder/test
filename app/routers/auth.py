@@ -19,7 +19,7 @@ except ImportError:
 from app.database import SessionLocal
 from app.models.user import User
 
-router = APIRouter(prefix="/auth", tags=["authentication"])
+router = APIRouter(tags=["authentication"])
 
 # 从环境变量获取密钥
 SECRET_KEY = os.getenv("SECRET_KEY", "your-secret-key-change-in-production")

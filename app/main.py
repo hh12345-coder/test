@@ -1,3 +1,6 @@
+"""
+应用启动文件
+"""
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.routers.place import router as place_router

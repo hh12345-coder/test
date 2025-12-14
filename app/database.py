@@ -5,8 +5,8 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-# 使用SQLite内存数据库以简化测试
-DB_URL = "sqlite:///:memory:"
+# 使用SQLite文件数据库以持久化数据
+DB_URL = "sqlite:///./school_meal.db"
 
 engine = create_engine(DB_URL, connect_args={"check_same_thread": False})
 

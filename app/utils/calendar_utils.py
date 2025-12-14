@@ -1,7 +1,7 @@
 from datetime import datetime, date, timedelta
 
-# 定义教学周开始日期（示例：2023年9月1日作为第1周开始）
-FIRST_WEEK_START = date(2023, 9, 1)
+# 定义教学周开始日期（2024年秋季学期示例）
+FIRST_WEEK_START = date(2024, 9, 2)
 
 # 定义总教学周数
 TOTAL_TEACHING_WEEKS = 20
@@ -20,27 +20,32 @@ CHINA_HOLIDAYS = {
 def is_holiday(date_obj):
     """
     判断给定日期是否为节假日（简化版本）
+    注意：这里只判断法定节假日，不判断周末，因为我们需要计算周一到周五的课程
     """
-    # 判断是否为周末
-    if date_obj.weekday() in [5, 6]:
-        return True
     # 判断是否为主要节假日
     holiday_key = (date_obj.month, date_obj.day)
     return holiday_key in CHINA_HOLIDAYS
 
-def in_teaching_week(date_obj):
+def in_teaching_week(base_date, target_week, check_date):
     """
-    判断给定日期是否在教学周内
+    判断给定日期是否在指定教学周内
+    base_date: 教学周开始日期
+    target_week: 目标教学周（1-20）
+    check_date: 要检查的日期
     """
-    delta_weeks = (date_obj - FIRST_WEEK_START).days // 7
-    return 0 <= delta_weeks < TOTAL_TEACHING_WEEKS
+    week_start = base_date + timedelta(weeks=target_week - 1)
+    week_end = week_start + timedelta(days=6)
+    return week_start <= check_date <= week_end
 
-def get_current_teaching_week():
+def get_current_teaching_week(base_date=FIRST_WEEK_START):
     """
     获取当前教学周
     """
     today = date.today()
-    delta_weeks = (today - FIRST_WEEK_START).days // 7 + 1
-    if 1 <= delta_weeks <= TOTAL_TEACHING_WEEKS:
-        return delta_weeks
-    return 1  # 默认返回第1周
+    delta_days = (today - base_date).days
+    if delta_days < 0:
+        return 1
+    current_week = (delta_days // 7) + 1
+    if 1 <= current_week <= TOTAL_TEACHING_WEEKS:
+        return current_week
+    return TOTAL_TEACHING_WEEKS
